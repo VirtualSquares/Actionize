@@ -1,0 +1,63 @@
+body, html{
+    background: linear-gradient(90deg, rgb(109, 25, 252) 16%, rgb(125, 31, 165) 56%);
+}
+
+.hero{
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.box{
+    background-color: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 7%;
+}
+
+.add{
+    font-family: Comfortaa;
+    border-radius: 50px;
+    background-color: rgb(209, 112, 76);
+    font-size: 29px;
+    cursor: pointer;
+    color: white;
+    padding: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.todo-container {
+    width: 80%;
+    max-width: 600px;
+    padding: 20px;
+    background: white;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.todo-item {
+    display: flex; /* Use Flexbox to align items horizontally */
+    align-items: center; /* Vertically align items */
+    margin: 10px 0;
+    padding: 5px;
+    border: 1px solid black; /* Add border */
+    border-radius: 4px; /* Add rounded corners */
+    background-color: #f9f9f9; /* Optional: background color */
+}
+
+
+
+.todo-text {
+    font-family: Comfortaa;
+    font-size: 30px; /* Set font size */
+    margin: 0; /* Remove default margin */
+    flex: 1; /* Allow text to take remaining space */
+}
+
+.completed {
+    text-decoration: line-through;
+    color: gray;
+}
