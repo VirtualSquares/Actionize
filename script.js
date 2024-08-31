@@ -1,58 +1,116 @@
-let add = document.getElementById("add");
-add.addEventListener("click", addFunc);
+document.addEventListener("DOMContentLoaded", loadTasks);
 
-function addFunc() {
-    let todo = document.getElementById("iText").value;
-    let box = document.getElementsByClassName("box")[0]; // Get the first element with class "box"
+let addButton = document.getElementById("add");
+addButton.addEventListener("click", addTask);
 
-    if (todo.trim() === "") {
+function addTask() {
+    let todoText = document.getElementById("iText").value;
+    let todoContainer = document.getElementById("todoContainer");
+
+    if (todoText.trim() === "") {
         alert("Please enter a todo item");
         return;
     }
 
-    // Create a container for the todo item and radio button
-    let todoContainer = document.createElement("div");
-    todoContainer.classList.add("todo-item");
+    let todoItem = document.createElement("div");
+    todoItem.classList.add("todo-item");
 
-    // Create and style the radio button
-    let radio = document.createElement("input");
-    radio.type = "checkbox";
-    radio.name = "todo";
-    radio.classList.add("todo-radio"); // Add a class for styling
-    radio.addEventListener("change", function() {
-        if (radio.checked) {
-            p.classList.add("completed");
+    // Create and style the checkbox
+    let checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.name = "todo";
+    checkbox.classList.add("todo-checkbox");
+    checkbox.addEventListener("change", function() {
+        if (checkbox.checked) {
+            todoTextElement.classList.add("completed");
         } else {
-            p.classList.remove("completed");
+            todoTextElement.classList.remove("completed");
         }
-    });
-    
-    let trash = document.createElement("button");
-    trash.textContent = "❌"
-    
-    trash.style.border = "None";
-
-    trash.addEventListener("click", function(){
-        box.removeChild(todoContainer)
+        updateLocalStorage();
     });
 
+    // Create and style the trash button
+    let trashButton = document.createElement("button");
+    trashButton.textContent = "❌";
+    trashButton.style.border = "None";
+    trashButton.addEventListener("click", function() {
+        todoContainer.removeChild(todoItem);
+        updateLocalStorage();
+    });
 
-    // Create and style the <p> element for the todo text
-    let p = document.createElement("p");
-    p.textContent = todo;
-    p.classList.add("todo-text"); // Add a class for styling
+    let todoTextElement = document.createElement("p");
+    todoTextElement.textContent = todoText;
+    todoTextElement.classList.add("todo-text");
 
-    // Append the radio button and <p> element to the container
-    todoContainer.appendChild(radio);
-    todoContainer.appendChild(p);
-    todoContainer.appendChild(trash)
+    todoItem.appendChild(checkbox);
+    todoItem.appendChild(todoTextElement);
+    todoItem.appendChild(trashButton);
 
-    // Append the todo container to the box
-    box.appendChild(todoContainer);
+    todoContainer.appendChild(todoItem);
 
-    // Clear the input field
     document.getElementById("iText").value = "";
+
+    saveTask(todoText, checkbox.checked);
 }
 
+function saveTask(todoText, completed) {
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    tasks.push({ text: todoText, completed: completed });
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+}
 
+function loadTasks() {
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    tasks.forEach(task => {
+        let todoContainer = document.getElementById("todoContainer");
 
+        let todoItem = document.createElement("div");
+        todoItem.classList.add("todo-item");
+
+        let checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.name = "todo";
+        checkbox.classList.add("todo-checkbox");
+        checkbox.checked = task.completed;
+        checkbox.addEventListener("change", function() {
+            if (checkbox.checked) {
+                todoTextElement.classList.add("completed");
+            } else {
+                todoTextElement.classList.remove("completed");
+            }
+            updateLocalStorage();
+        });
+
+        let trashButton = document.createElement("button");
+        trashButton.textContent = "❌";
+        trashButton.style.border = "None";
+        trashButton.addEventListener("click", function() {
+            todoContainer.removeChild(todoItem);
+            updateLocalStorage();
+        });
+
+        let todoTextElement = document.createElement("p");
+        todoTextElement.textContent = task.text;
+        todoTextElement.classList.add("todo-text");
+        if (task.completed) {
+            todoTextElement.classList.add("completed");
+        }
+
+        todoItem.appendChild(checkbox);
+        todoItem.appendChild(todoTextElement);
+        todoItem.appendChild(trashButton);
+
+        todoContainer.appendChild(todoItem);
+    });
+}
+
+function updateLocalStorage() {
+    let todoItems = document.querySelectorAll(".todo-item");
+    let tasks = [];
+    todoItems.forEach(item => {
+        let text = item.querySelector(".todo-text").textContent;
+        let completed = item.querySelector(".todo-checkbox").checked;
+        tasks.push({ text: text, completed: completed });
+    });
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+}
