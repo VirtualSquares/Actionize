@@ -19,7 +19,7 @@ body, html{
 
 .add{
     font-family: Comfortaa;
-    border-radius: 50px;
+    border-radius: 10px;
     background-color: rgb(209, 112, 76);
     font-size: 29px;
     cursor: pointer;
@@ -48,8 +48,6 @@ body, html{
     background-color: #f9f9f9; /* Optional: background color */
 }
 
-
-
 .todo-text {
     font-family: Comfortaa;
     font-size: 30px; /* Set font size */
@@ -60,4 +58,16 @@ body, html{
 .completed {
     text-decoration: line-through;
     color: gray;
+}
+
+.calendar{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: right;
+}
+
+#calendar{
+    font-size: 20px;
+    border-radius: 10px;
 }
