@@ -13,18 +13,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function addTask() {
     let todoText = document.getElementById("iText").value;
-    let todoContainer = document.getElementById("todoContainer");
     let date = document.getElementById("calendar").value;
-
-    console.log(date); 
 
     if (todoText.trim() === "") {
         alert("Please enter a todo item");
         return;
     }
 
+    // Generate a unique ID for each task
+    let taskId = new Date().getTime().toString();
+
     let todoItem = document.createElement("div");
     todoItem.classList.add("todo-item");
+    todoItem.dataset.id = taskId; // Store the unique ID in the element
+    todoItem.dataset.date = date; // Store the date associated with the task
 
     let checkbox = document.createElement("input");
     checkbox.type = "checkbox";
@@ -43,7 +45,7 @@ function addTask() {
     trashButton.textContent = "❌";
     trashButton.style.border = "None";
     trashButton.addEventListener("click", function() {
-        todoContainer.removeChild(todoItem);
+        todoItem.style.display = "none"; // Hide the item instead of removing
         updateLocalStorage();
     });
 
@@ -51,36 +53,38 @@ function addTask() {
     todoTextElement.textContent = todoText;
     todoTextElement.classList.add("todo-text");
 
-    
     todoItem.appendChild(checkbox);
     todoItem.appendChild(todoTextElement);
     todoItem.appendChild(trashButton);
 
-    todoContainer.appendChild(todoItem);
+    document.getElementById("todoContainer").appendChild(todoItem);
 
     document.getElementById("iText").value = "";
 
-    saveTask(todoText, checkbox.checked, date); 
+    saveTask(taskId, todoText, checkbox.checked, date); 
 }
 
-function saveTask(todoText, completed, date) {
+function saveTask(id, text, completed, date) {
     let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-    tasks.push({ text: todoText, completed: completed, date: date });
+    tasks = tasks.filter(task => task.id !== id); // Remove any existing task with the same ID
+    tasks.push({ id: id, text: text, completed: completed, date: date });
     localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 
 function loadTasks() {
     let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
     tasks.forEach(task => {
-        createTodoItem(task.text, task.completed, task.date);
+        createTodoItem(task.id, task.text, task.completed, task.date);
     });
 }
 
-function createTodoItem(text, completed, date) {
+function createTodoItem(id, text, completed, date) {
     let todoContainer = document.getElementById("todoContainer");
 
     let todoItem = document.createElement("div");
     todoItem.classList.add("todo-item");
+    todoItem.dataset.id = id; // Store the unique ID in the element
+    todoItem.dataset.date = date; // Store the date associated with the task
 
     let checkbox = document.createElement("input");
     checkbox.type = "checkbox";
@@ -100,7 +104,7 @@ function createTodoItem(text, completed, date) {
     trashButton.textContent = "❌";
     trashButton.style.border = "None";
     trashButton.addEventListener("click", function() {
-        todoContainer.removeChild(todoItem);
+        todoItem.style.display = "none"; // Hide the item instead of removing
         updateLocalStorage();
     });
 
@@ -123,19 +127,16 @@ function filterTasksByDate(date) {
 
     Array.from(todoContainer.childNodes).forEach(child => {
         if (child.classList && child.classList.contains('todo-item')) {
-            todoContainer.removeChild(child);
+            if (child.dataset.date !== date && date !== '') {
+                child.style.display = "none"; // Hide tasks not matching the date
+            } else {
+                child.style.display = ""; // Show tasks matching the date
+            }
         }
     });
 
     let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-    let hasVisibleTasks = false; 
-
-    tasks.forEach(task => {
-        if (task.date === date || date === '') {
-            createTodoItem(task.text, task.completed, task.date);
-            hasVisibleTasks = true; 
-        }
-    });
+    let hasVisibleTasks = tasks.some(task => task.date === date || date === '');
 
     let existingMessage = document.querySelector('.no-tasks-message');
     if (!hasVisibleTasks && date) {
@@ -154,11 +155,12 @@ function updateLocalStorage() {
     let todoItems = document.querySelectorAll(".todo-item");
     let tasks = [];
     todoItems.forEach(item => {
+        let id = item.dataset.id;
         let text = item.querySelector(".todo-text").textContent;
         let completed = item.querySelector(".todo-checkbox").checked;
+        let date = item.dataset.date;
 
-        let date = item.querySelector(".todo-date") ? item.querySelector(".todo-date").textContent : '';
-        tasks.push({ text: text, completed: completed, date: date });
+        tasks.push({ id: id, text: text, completed: completed, date: date });
     });
     localStorage.setItem("tasks", JSON.stringify(tasks));
 }
