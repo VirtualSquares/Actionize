@@ -8,8 +8,22 @@ document.addEventListener("DOMContentLoaded", () => {
         dateInput.addEventListener("change", function() {
             filterTasksByDate(dateInput.value);
         });
+
+        // Initial filter to hide tasks if no date is selected
+        if (!dateInput.value) {
+            hideAllTasks();
+        }
     }
 });
+
+function hideAllTasks() {
+    let todoContainer = document.getElementById("todoContainer");
+    Array.from(todoContainer.childNodes).forEach(child => {
+        if (child.classList && child.classList.contains('todo-item')) {
+            child.style.display = "none";
+        }
+    });
+}
 
 function addTask() {
     let todoText = document.getElementById("iText").value;
@@ -76,6 +90,12 @@ function loadTasks() {
     tasks.forEach(task => {
         createTodoItem(task.id, task.text, task.completed, task.date);
     });
+
+    // Check the date input and hide tasks if no date is selected
+    let dateInput = document.getElementById("calendar");
+    if (dateInput && !dateInput.value) {
+        hideAllTasks();
+    }
 }
 
 function createTodoItem(id, text, completed, date) {
@@ -127,7 +147,7 @@ function filterTasksByDate(date) {
 
     Array.from(todoContainer.childNodes).forEach(child => {
         if (child.classList && child.classList.contains('todo-item')) {
-            if (child.dataset.date !== date) {
+            if (child.dataset.date !== date && date !== '') {
                 child.style.display = "none"; // Hide tasks not matching the date
             } else {
                 child.style.display = ""; // Show tasks matching the date
@@ -135,17 +155,8 @@ function filterTasksByDate(date) {
         }
     });
 
-    // If date is empty, hide all tasks
-    if (!date) {
-        Array.from(todoContainer.childNodes).forEach(child => {
-            if (child.classList && child.classList.contains('todo-item')) {
-                child.style.display = "none"; // Hide all tasks if no date is selected
-            }
-        });
-    }
-
     let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-    let hasVisibleTasks = tasks.some(task => task.date === date);
+    let hasVisibleTasks = tasks.some(task => task.date === date || date === '');
 
     let existingMessage = document.querySelector('.no-tasks-message');
     if (!hasVisibleTasks && date) {
