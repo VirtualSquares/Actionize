@@ -61,7 +61,7 @@ function addTask() {
 
     document.getElementById("iText").value = "";
 
-    saveTask(taskId, todoText, checkbox.checked, date); 
+    saveTask(taskId, todoText, checkbox.checked, date);
 }
 
 function saveTask(id, text, completed, date) {
@@ -127,7 +127,7 @@ function filterTasksByDate(date) {
 
     Array.from(todoContainer.childNodes).forEach(child => {
         if (child.classList && child.classList.contains('todo-item')) {
-            if (child.dataset.date !== date && date !== '') {
+            if (child.dataset.date !== date) {
                 child.style.display = "none"; // Hide tasks not matching the date
             } else {
                 child.style.display = ""; // Show tasks matching the date
@@ -135,8 +135,17 @@ function filterTasksByDate(date) {
         }
     });
 
+    // If date is empty, hide all tasks
+    if (!date) {
+        Array.from(todoContainer.childNodes).forEach(child => {
+            if (child.classList && child.classList.contains('todo-item')) {
+                child.style.display = "none"; // Hide all tasks if no date is selected
+            }
+        });
+    }
+
     let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-    let hasVisibleTasks = tasks.some(task => task.date === date || date === '');
+    let hasVisibleTasks = tasks.some(task => task.date === date);
 
     let existingMessage = document.querySelector('.no-tasks-message');
     if (!hasVisibleTasks && date) {
